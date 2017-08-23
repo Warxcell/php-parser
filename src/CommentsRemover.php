@@ -2,10 +2,14 @@
 
 namespace VM5\PhpCommentsRemover;
 
+use PhpParser\NodeTraverser;
+use PhpParser\Parser;
+use PhpParser\PrettyPrinterAbstract;
+
 class CommentsRemover
 {
     /**
-     * @var \PhpParser\Parser
+     * @var Parser
      */
     private $phpParser;
 
@@ -15,7 +19,7 @@ class CommentsRemover
     private $nodeTraverser;
 
     /**
-     * @var \PhpParser\PrettyPrinterAbstract
+     * @var PrettyPrinterAbstract
      */
     private $phpDumper;
 
@@ -25,35 +29,40 @@ class CommentsRemover
     private $saver;
 
     /**
-     * RemoveComments constructor.
-     * @param \PhpParser\Parser $phpParser
+     * CommentsRemover constructor.
+     * @param Parser $phpParser
+     * @param NodeTraverser $nodeTraverser
+     * @param Visitor $visitor
+     * @param PrettyPrinterAbstract $phpDumper
+     * @param Saver $saver
      */
     public function __construct(
-        \PhpParser\Parser $phpParser,
+        Parser $phpParser,
         NodeTraverser $nodeTraverser,
-        Comments $commentsRemoverTraverser,
-        \PhpParser\PrettyPrinterAbstract $phpDumper,
+        Visitor $visitor,
+        PrettyPrinterAbstract $phpDumper,
         Saver $saver
     ) {
         $this->phpParser = $phpParser;
         $this->nodeTraverser = $nodeTraverser;
-        $this->nodeTraverser->addVisitor($commentsRemoverTraverser);
+        $this->nodeTraverser->addVisitor($visitor);
         $this->phpDumper = $phpDumper;
+        $this->saver = $saver;
     }
 
 
     public function removeFromDirectory($directory)
     {
-        $files = new RecursiveIteratorIterator(new RecursiveDirectoryIterator($directory));
-        $phpFiles = new RegexIterator($files, '/\.php$/');
+        $files = new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator($directory));
+        $phpFiles = new \RegexIterator($files, '/\.php$/');
 
         foreach ($phpFiles as $file) {
-            /** @var $file SplFileInfo */
+            /** @var $file \SplFileInfo */
             $this->removeFromFile($file);
         }
     }
 
-    public function removeFromFile(SplFileInfo $fileInfo)
+    public function removeFromFile(\SplFileInfo $fileInfo)
     {
         $stmts = $this->phpParser->parse(file_get_contents($fileInfo->getPathname()));
         $stmts = $this->nodeTraverser->traverse($stmts);

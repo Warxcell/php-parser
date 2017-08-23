@@ -2,26 +2,33 @@
 
 namespace VM5\PhpCommentsRemover;
 
-class Traverser implements \PhpParser\NodeVisitor
+use phpDocumentor\Reflection\DocBlock;
+use phpDocumentor\Reflection\DocBlock\Serializer;
+use phpDocumentor\Reflection\DocBlockFactory;
+use PhpParser\Comment\Doc;
+use PhpParser\Node;
+use PhpParser\NodeVisitor;
+
+class Visitor implements NodeVisitor
 {
     /**
-     * @var \phpDocumentor\Reflection\DocBlockFactory
+     * @var DocBlockFactory
      */
     private $docBlockFactory;
 
     /**
-     * @var \phpDocumentor\Reflection\DocBlock\Serializer
+     * @var Serializer
      */
     private $docBlockSerializer;
 
     /**
-     * Comments constructor.
-     * @param \phpDocumentor\Reflection\DocBlockFactory $docBlockFactory
-     * @param \phpDocumentor\Reflection\DocBlock\Serializer $docBlockSerializer
+     * Traverser constructor.
+     * @param DocBlockFactory $docBlockFactory
+     * @param Serializer $docBlockSerializer
      */
     public function __construct(
-        \phpDocumentor\Reflection\DocBlockFactory $docBlockFactory,
-        \phpDocumentor\Reflection\DocBlock\Serializer $docBlockSerializer
+        DocBlockFactory $docBlockFactory,
+        Serializer $docBlockSerializer
     ) {
         $this->docBlockFactory = $docBlockFactory;
         $this->docBlockSerializer = $docBlockSerializer;
@@ -32,18 +39,18 @@ class Traverser implements \PhpParser\NodeVisitor
     {
     }
 
-    public function enterNode(\PhpParser\Node $node)
+    public function enterNode(Node $node)
     {
 
     }
 
-    public function leaveNode(\PhpParser\Node $node)
+    public function leaveNode(Node $node)
     {
         $docComments = $node->getAttribute('comments');
         if ($docComments) {
             $newDocComments = [];
             foreach ($docComments as $docComment) {
-                if ($docComment instanceof \PhpParser\Comment\Doc) {
+                if ($docComment instanceof Doc) {
                     $da = $this->docBlockFactory->create($docComment->getText());
 
                     $newTags = [];
@@ -56,7 +63,7 @@ class Traverser implements \PhpParser\NodeVisitor
                     }
 
                     if (count($newTags) != 0) {
-                        $cloned = new \phpDocumentor\Reflection\DocBlock(
+                        $cloned = new DocBlock(
                             $da->getSummary(),
                             $da->getDescription(),
                             $newTags,
