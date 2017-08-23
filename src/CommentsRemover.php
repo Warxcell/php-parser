@@ -66,7 +66,7 @@ class CommentsRemover
     {
         $stmts = $this->phpParser->parse(file_get_contents($fileInfo->getPathname()));
         $stmts = $this->nodeTraverser->traverse($stmts);
-        $code = $this->phpDumper->prettyPrint($stmts);
+        $code = "<?php \n\n".$this->phpDumper->prettyPrint($stmts);
 
         $this->saver->save($fileInfo, $code);
     }
