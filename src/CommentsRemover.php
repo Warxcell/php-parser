@@ -64,10 +64,14 @@ class CommentsRemover
 
     public function removeFromFile(\SplFileInfo $fileInfo)
     {
-        $stmts = $this->phpParser->parse(file_get_contents($fileInfo->getPathname()));
-        $stmts = $this->nodeTraverser->traverse($stmts);
-        $code = "<?php \n\n".$this->phpDumper->prettyPrint($stmts);
+        try {
+            $stmts = $this->phpParser->parse(file_get_contents($fileInfo->getPathname()));
+            $stmts = $this->nodeTraverser->traverse($stmts);
+            $code = "<?php \n\n".$this->phpDumper->prettyPrint($stmts);
 
-        $this->saver->save($fileInfo, $code);
+            $this->saver->save($fileInfo, $code);
+        } catch (\Exception $ex) {
+            throw new Exception('Error while processing '.$fileInfo->getPathname(), 0, $ex);
+        }
     }
 }
