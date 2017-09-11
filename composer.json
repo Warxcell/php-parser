@@ -1,6 +1,6 @@
 {
-  "name": "vm5/php-comments-remover",
-  "description": "This package removes all the PHP comments (NOT the DocBlocks) - including @author and @copyright tags from docblocks.",
+  "name": "vm5/php-parser",
+  "description": "This package can parse easily PHP Files. There is a visitor which removes all the PHP comments (NOT the DocBlocks) - including @author and @copyright tags from docblocks.",
   "type": "package",
   "authors": [
     {
