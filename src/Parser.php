@@ -56,7 +56,7 @@ class Parser
 
         foreach ($phpFiles as $file) {
             /** @var $file \SplFileInfo */
-            $this->removeFromFile($file);
+            $this->parseFile($file);
         }
     }
 
