@@ -17,8 +17,13 @@ $parserFactory = new \PhpParser\ParserFactory();
 $docBlockFactory = \phpDocumentor\Reflection\DocBlockFactory::createInstance();
 $serializer = new \phpDocumentor\Reflection\DocBlock\Serializer();
 
-$traverser = new NodeTraverser;
-$traverser->addVisitor(new \VM5\PhpParser\CommentsRemoverVisitor($docBlockFactory, $serializer));
+$docBlockVisitors = [
+    new \VM5\PhpParser\DocBlockVisitor\CommentsRemoverDocBlockVisitor(),
+];
+
+$visitor = new \VM5\PhpParser\NodeVisitor\DocBlockVisitor($docBlockFactory, $serializer, $docBlockVisitors);
+$nodeTraverser = new NodeTraverser();
+$nodeTraverser->addVisitor($visitor);
 
 $removeComments = new \VM5\PhpCommentsRemover\CommentsRemover(
     $parserFactory->create(\PhpParser\ParserFactory::PREFER_PHP5),
