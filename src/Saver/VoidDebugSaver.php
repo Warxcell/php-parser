@@ -1,15 +1,9 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: bozhidar.hristov
- * Date: 9/11/17
- * Time: 12:50 PM
- */
 
-namespace VM5\PhpCommentsRemover\Saver;
+namespace VM5\PhpParser\Saver;
 
 
-class VoidDebugSaver implements \VM5\PhpCommentsRemover\Saver
+class VoidDebugSaver implements \VM5\PhpParser\Saver
 {
     /**
      * @var array

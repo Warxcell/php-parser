@@ -1,6 +1,6 @@
 <?php
 
-namespace VM5\PhpCommentsRemover;
+namespace VM5\PhpParser;
 
 use phpDocumentor\Reflection\DocBlock;
 use phpDocumentor\Reflection\DocBlock\Serializer;
@@ -11,7 +11,7 @@ use PhpParser\Comment\Doc;
 use PhpParser\Node;
 use PhpParser\NodeVisitor;
 
-class Visitor implements NodeVisitor
+class CommentsRemoverVisitor implements NodeVisitor
 {
     /**
      * @var DocBlockFactory

@@ -1,8 +1,8 @@
 <?php
 
-namespace VM5\PhpCommentsRemover\Saver;
+namespace VM5\PhpParser\Saver;
 
-use VM5\PhpCommentsRemover\Saver;
+use VM5\PhpParser\Saver;
 
 class SameFileSaver implements Saver
 {

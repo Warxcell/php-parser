@@ -1,16 +1,16 @@
 <?php
 
-namespace VM5\PhpCommentsRemover;
+namespace VM5\PhpParser;
 
 use PhpParser\NodeTraverser;
 use PhpParser\NodeVisitor\NameResolver;
-use PhpParser\Parser;
+use PhpParser\Parser as PHPParser;
 use PhpParser\PrettyPrinterAbstract;
 
-class CommentsRemover
+class Parser
 {
     /**
-     * @var Parser
+     * @var PHPParser
      */
     private $phpParser;
 
@@ -31,29 +31,25 @@ class CommentsRemover
 
     /**
      * CommentsRemover constructor.
-     * @param Parser $phpParser
+     * @param PHPParser $phpParser
      * @param NodeTraverser $nodeTraverser
-     * @param Visitor $visitor
      * @param PrettyPrinterAbstract $phpDumper
      * @param Saver $saver
      */
     public function __construct(
-        Parser $phpParser,
+        PHPParser $phpParser,
         NodeTraverser $nodeTraverser,
-        Visitor $visitor,
         PrettyPrinterAbstract $phpDumper,
         Saver $saver
     ) {
         $this->phpParser = $phpParser;
         $this->nodeTraverser = $nodeTraverser;
-//        $this->nodeTraverser->addVisitor(new NameResolver());
-        $this->nodeTraverser->addVisitor($visitor);
         $this->phpDumper = $phpDumper;
         $this->saver = $saver;
     }
 
 
-    public function removeFromDirectory($directory)
+    public function parseDirectory($directory)
     {
         $files = new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator($directory));
         $phpFiles = new \RegexIterator($files, '/\.php$/');
@@ -64,7 +60,7 @@ class CommentsRemover
         }
     }
 
-    public function removeFromFile(\SplFileInfo $fileInfo)
+    public function parseFile(\SplFileInfo $fileInfo)
     {
         try {
             $stmts = $this->phpParser->parse(file_get_contents($fileInfo->getPathname()));

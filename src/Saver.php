@@ -1,10 +1,10 @@
 <?php
 
-namespace VM5\PhpCommentsRemover;
+namespace VM5\PhpParser;
 
 /**
  * Interface Saver
- * @package VM5\PhpCommentsRemover
+ * @package VM5\PhpParser
  */
 interface Saver
 {
