@@ -3,6 +3,7 @@
 namespace VM5\PhpCommentsRemover;
 
 use PhpParser\NodeTraverser;
+use PhpParser\NodeVisitor\NameResolver;
 use PhpParser\Parser;
 use PhpParser\PrettyPrinterAbstract;
 
@@ -45,6 +46,7 @@ class CommentsRemover
     ) {
         $this->phpParser = $phpParser;
         $this->nodeTraverser = $nodeTraverser;
+//        $this->nodeTraverser->addVisitor(new NameResolver());
         $this->nodeTraverser->addVisitor($visitor);
         $this->phpDumper = $phpDumper;
         $this->saver = $saver;
@@ -67,7 +69,7 @@ class CommentsRemover
         try {
             $stmts = $this->phpParser->parse(file_get_contents($fileInfo->getPathname()));
             $stmts = $this->nodeTraverser->traverse($stmts);
-            $code = "<?php \n\n".$this->phpDumper->prettyPrint($stmts);
+            $code = $this->phpDumper->prettyPrintFile($stmts);
 
             $this->saver->save($fileInfo, $code);
         } catch (\Exception $ex) {

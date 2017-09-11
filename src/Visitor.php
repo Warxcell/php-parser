@@ -5,6 +5,8 @@ namespace VM5\PhpCommentsRemover;
 use phpDocumentor\Reflection\DocBlock;
 use phpDocumentor\Reflection\DocBlock\Serializer;
 use phpDocumentor\Reflection\DocBlockFactory;
+use phpDocumentor\Reflection\Location;
+use phpDocumentor\Reflection\Types\Context;
 use PhpParser\Comment\Doc;
 use PhpParser\Node;
 use PhpParser\NodeVisitor;
@@ -22,6 +24,16 @@ class Visitor implements NodeVisitor
     private $docBlockSerializer;
 
     /**
+     * @var Node\Name
+     */
+    private $namespace;
+
+    /**
+     * @var Node\Name[]
+     */
+    protected $aliases = [];
+
+    /**
      * Traverser constructor.
      * @param DocBlockFactory $docBlockFactory
      * @param Serializer $docBlockSerializer
@@ -34,14 +46,37 @@ class Visitor implements NodeVisitor
         $this->docBlockSerializer = $docBlockSerializer;
     }
 
+    private function resetState(Node\Name $namespace = null)
+    {
+        $this->namespace = $namespace;
+        $this->aliases = [];
+    }
 
     public function beforeTraverse(array $nodes)
     {
+        $this->resetState();
     }
 
     public function enterNode(Node $node)
     {
+        if ($node instanceof Node\Stmt\Namespace_) {
+            $this->resetState($node->name);
+        } elseif ($node instanceof Node\Stmt\Use_) {
+            foreach ($node->uses as $use) {
+                $this->addAlias($use, null);
+            }
+        } elseif ($node instanceof Node\Stmt\GroupUse) {
+            foreach ($node->uses as $use) {
+                $this->addAlias($use, $node->prefix);
+            }
+        }
+    }
 
+    protected function addAlias(Node\Stmt\UseUse $use, Node\Name $prefix = null)
+    {
+        $name = $prefix ? Name::concat($prefix, $use->name) : $use->name;
+
+        $this->aliases[$use->alias] = $name;
     }
 
     public function leaveNode(Node $node)
@@ -51,7 +86,16 @@ class Visitor implements NodeVisitor
             $newDocComments = [];
             foreach ($docComments as $docComment) {
                 if ($docComment instanceof Doc) {
-                    $da = $this->docBlockFactory->create($docComment->getText());
+                    $namespace = $this->namespace->toString();
+
+                    $aliases = [];
+                    foreach ($this->aliases as $alias => $full) {
+                        $aliases[$alias] = $full->toString();
+                    }
+
+                    $context = new Context($namespace, $aliases);
+                    $location = new Location($docComment->getLine());
+                    $da = $this->docBlockFactory->create($docComment->getText(), $context, $location);
 
                     $newTags = [];
 
